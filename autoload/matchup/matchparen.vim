@@ -141,6 +141,8 @@ function! s:matchparen.clear() abort dict " {{{1
   endif
   if exists('s:ns_id')
     call nvim_buf_clear_namespace(0, s:ns_id, 0, -1)
+    " Remove signs placed by 'add_matches'
+    execute 'sign unplace * group=matchup buffer=' . bufnr('')
   endif
 
   if !has('nvim') && exists('t:match_popup') && (exists('*win_gettype')
@@ -1173,6 +1175,10 @@ endfunction
 
 " }}}1
 
+execute 'sign define MatchPairOpen text=• texthl=@attribute'
+execute 'sign define MatchPairMid text=• texthl=@attribute'
+execute 'sign define MatchPairClose text=• texthl=@attribute'
+
 function! s:add_matches(corrlist, ...) " {{{1
   if !exists('w:matchup_match_id_list')
     let w:matchup_match_id_list = []
@@ -1212,6 +1218,17 @@ function! s:add_matches(corrlist, ...) " {{{1
         call nvim_buf_add_highlight(0, s:ns_id, l:group,
               \ l:corr.lnum - 1, l:corr.cnum - 1,
               \ l:corr.cnum - 1 + strlen(l:corr.match))
+
+        if l:corr.side == 'open'
+          let l:signhl = 'MatchPairOpen'
+        elseif l:corr.side == 'close'
+          let l:signhl = 'MatchPairClose'
+        else
+          let l:signhl = 'MatchPairMid'
+        endif 
+
+        execute 'sign place '.l:corr.lnum.' line='.l:corr.lnum.' name='.l:signhl.' priority='.(l:corr.lnum + l:corr.cnum).' group=matchup buffer='.bufnr('')
+
       end
     elseif exists('*matchaddpos')
       call add(w:matchup_match_id_list, matchaddpos(l:group,
