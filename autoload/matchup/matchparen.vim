@@ -1175,9 +1175,9 @@ endfunction
 
 " }}}1
 
-execute 'sign define MatchPairOpen text=• texthl=@attribute'
-execute 'sign define MatchPairMid text=• texthl=@attribute'
-execute 'sign define MatchPairClose text=• texthl=@attribute'
+execute 'sign define MatchPairOpen text=- texthl=@attribute'
+execute 'sign define MatchPairMid text=- texthl=@attribute'
+execute 'sign define MatchPairClose text=- texthl=@attribute'
 
 function! s:add_matches(corrlist, ...) " {{{1
   if !exists('w:matchup_match_id_list')
@@ -1194,6 +1194,7 @@ function! s:add_matches(corrlist, ...) " {{{1
   endif
 
   for l:corr in a:corrlist
+    "echom string(l:corr.side)
     if a:0 && l:corr.match_index == a:1.match_index
       let l:group = s:wordish(l:corr) ? l:mwc : 'MatchParenCur'
     else
@@ -1227,7 +1228,7 @@ function! s:add_matches(corrlist, ...) " {{{1
           let l:signhl = 'MatchPairMid'
         endif 
 
-        execute 'sign place '.l:corr.lnum.' line='.l:corr.lnum.' name='.l:signhl.' priority='.(l:corr.lnum + l:corr.cnum).' group=matchup buffer='.bufnr('')
+        execute 'sign place '.l:corr.lnum.' line='.l:corr.lnum.' name='.l:signhl.' priority=10 group=matchup buffer='.bufnr('')
 
       end
     elseif exists('*matchaddpos')
